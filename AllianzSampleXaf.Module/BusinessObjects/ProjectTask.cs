@@ -1,3 +1,4 @@
+using DevExpress.ExpressApp.ConditionalAppearance;
 using DevExpress.ExpressApp.DC;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl.EF;
@@ -7,6 +8,8 @@ using System.ComponentModel.DataAnnotations;
 namespace AllianzSampleXaf.Module.BusinessObjects;
 [NavigationItem("Planning")]
 [RuleCriteria($"{nameof(EndDate)} >= {nameof(StartDate)}", CustomMessageTemplate = "Start Date must be less than End Date")]
+[Appearance($"{nameof(ProjectTaskStatus.InProgress)}", TargetItems = $"{nameof(Subject)};{nameof(AssignedTo)}",
+    Criteria = $"{nameof(Status)} = 1", BackColor = "LemonChiffon")]
 public class ProjectTask : BaseObject
 {
     [FieldSize(255)]
