@@ -1,0 +1,3 @@
+add-migration MyInitialMigrationName -StartupProject "AllianzSampleXaf.Module" -Project "AllianzSampleXaf.Module"
+
+update-database -StartupProject "AllianzSampleXaf.Module" -Project "AllianzSampleXaf.Module"

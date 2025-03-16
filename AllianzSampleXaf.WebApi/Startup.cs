@@ -50,7 +50,7 @@ public class Startup {
                             connectionString = Configuration.GetConnectionString("ConnectionString");
                         }
                         ArgumentNullException.ThrowIfNull(connectionString);
-                        options.UseSqlServer(connectionString);
+                        options.UseNpgsql(connectionString);
                         options.UseChangeTrackingProxies();
                         options.UseObjectSpaceLinkProxies();
                         options.UseLazyLoadingProxies();
