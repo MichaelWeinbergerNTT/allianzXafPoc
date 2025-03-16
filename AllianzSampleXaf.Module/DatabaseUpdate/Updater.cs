@@ -11,12 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace AllianzSampleXaf.Module.DatabaseUpdate;
 
 // For more typical usage scenarios, be sure to check out https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Updating.ModuleUpdater
-public class Updater : ModuleUpdater
+public class Updater(IObjectSpace objectSpace, Version currentDBVersion) : ModuleUpdater(objectSpace, currentDBVersion)
 {
-    public Updater(IObjectSpace objectSpace, Version currentDBVersion) :
-        base(objectSpace, currentDBVersion)
-    {
-    }
     public override void UpdateDatabaseAfterUpdateSchema()
     {
         base.UpdateDatabaseAfterUpdateSchema();

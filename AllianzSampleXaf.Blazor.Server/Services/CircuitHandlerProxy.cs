@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Components.Server.Circuits;
 
 namespace AllianzSampleXaf.Blazor.Server.Services;
 
-internal class CircuitHandlerProxy : CircuitHandler {
-    private readonly IScopedCircuitHandler scopedCircuitHandler;
-    public CircuitHandlerProxy(IScopedCircuitHandler scopedCircuitHandler) {
-        this.scopedCircuitHandler = scopedCircuitHandler;
-    }
+internal class CircuitHandlerProxy(IScopedCircuitHandler scopedCircuitHandler) : CircuitHandler {
+    private readonly IScopedCircuitHandler scopedCircuitHandler = scopedCircuitHandler;
+
     public override Task OnCircuitOpenedAsync(Circuit circuit, CancellationToken cancellationToken) {
         return scopedCircuitHandler.OnCircuitOpenedAsync(cancellationToken);
     }

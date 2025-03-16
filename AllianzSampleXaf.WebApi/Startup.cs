@@ -1,52 +1,53 @@
-﻿using DevExpress.ExpressApp.Security;
-using DevExpress.Persistent.Base;
-using Microsoft.EntityFrameworkCore;
-using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using DevExpress.ExpressApp.WebApi.Services;
-using Microsoft.AspNetCore.OData;
-using AllianzSampleXaf.WebApi.JWT;
-using DevExpress.ExpressApp.Security.Authentication.ClientServer;
+﻿using AllianzSampleXaf.WebApi.JWT;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.ApplicationBuilder;
+using DevExpress.ExpressApp.Security;
+using DevExpress.ExpressApp.Security.Authentication.ClientServer;
+using DevExpress.ExpressApp.WebApi.Services;
+using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace AllianzSampleXaf.WebApi;
 
-public class Startup {
-    public Startup(IConfiguration configuration) {
-        Configuration = configuration;
-    }
-
-    public IConfiguration Configuration { get; }
+public class Startup(IConfiguration configuration)
+{
+    public IConfiguration Configuration { get; } = configuration;
 
     // This method gets called by the runtime. Use this method to add services to the container.
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-    public void ConfigureServices(IServiceCollection services) {
+    public void ConfigureServices(IServiceCollection services)
+    {
         services.AddScoped<IAuthenticationTokenProvider, JwtTokenProviderService>();
 
-        services.AddXafWebApi(builder => {
-            builder.ConfigureOptions(options => {
+        services.AddXafWebApi(builder =>
+        {
+            builder.ConfigureOptions(options =>
+            {
                 // Make your business objects available in the Web API and generate the GET, POST, PUT, and DELETE HTTP methods for it.
                 // options.BusinessObject<YourBusinessObject>();
             });
 
             builder.Modules
                 .AddValidation()
-                .Add<AllianzSampleXaf.Module.AllianzSampleXafModule>();
+                .Add<Module.AllianzSampleXafModule>();
 
             builder.ObjectSpaceProviders
                 .AddSecuredEFCore(options => options.PreFetchReferenceProperties())
-                    .WithDbContext<AllianzSampleXaf.Module.BusinessObjects.AllianzSampleXafEFCoreDbContext>((serviceProvider, options) => {
+                    .WithDbContext<Module.BusinessObjects.AllianzSampleXafEFCoreDbContext>((serviceProvider, options) =>
+                    {
                         // Uncomment this code to use an in-memory database. This database is recreated each time the server starts. With the in-memory database, you don't need to make a migration when the data model is changed.
                         // Do not use this code in production environment to avoid data loss.
                         // We recommend that you refer to the following help topic before you use an in-memory database: https://docs.microsoft.com/en-us/ef/core/testing/in-memory
                         //options.UseInMemoryDatabase("InMemory");
                         string connectionString = null;
-                        if(Configuration.GetConnectionString("ConnectionString") != null) {
+                        if (Configuration.GetConnectionString("ConnectionString") != null)
+                        {
                             connectionString = Configuration.GetConnectionString("ConnectionString");
                         }
                         ArgumentNullException.ThrowIfNull(connectionString);
@@ -58,31 +59,37 @@ public class Startup {
                 .AddNonPersistent();
 
             builder.Security
-                .UseIntegratedMode(options => {
+                .UseIntegratedMode(options =>
+                {
                     options.Lockout.Enabled = true;
 
                     options.RoleType = typeof(PermissionPolicyRole);
                     // ApplicationUser descends from PermissionPolicyUser and supports the OAuth authentication. For more information, refer to the following topic: https://docs.devexpress.com/eXpressAppFramework/402197
                     // If your application uses PermissionPolicyUser or a custom user type, set the UserType property as follows:
-                    options.UserType = typeof(AllianzSampleXaf.Module.BusinessObjects.ApplicationUser);
+                    options.UserType = typeof(Module.BusinessObjects.ApplicationUser);
                     // ApplicationUserLoginInfo is only necessary for applications that use the ApplicationUser user type.
                     // If you use PermissionPolicyUser or a custom user type, comment out the following line:
-                    options.UserLoginInfoType = typeof(AllianzSampleXaf.Module.BusinessObjects.ApplicationUserLoginInfo);
-                    options.Events.OnSecurityStrategyCreated += securityStrategy => {
+                    options.UserLoginInfoType = typeof(Module.BusinessObjects.ApplicationUserLoginInfo);
+                    options.Events.OnSecurityStrategyCreated += securityStrategy =>
+                    {
                         ((SecurityStrategy)securityStrategy).PermissionsReloadMode = PermissionsReloadMode.CacheOnFirstAccess;
                     };
                 })
-                .AddPasswordAuthentication(options => {
+                .AddPasswordAuthentication(options =>
+                {
                     options.IsSupportChangePassword = true;
                 });
 
-            builder.AddBuildStep(application => {
+            builder.AddBuildStep(application =>
+            {
                 application.ApplicationName = "SetupApplication.AllianzSampleXaf";
-                application.CheckCompatibilityType = DevExpress.ExpressApp.CheckCompatibilityType.DatabaseSchema;
+                application.CheckCompatibilityType = CheckCompatibilityType.DatabaseSchema;
 #if DEBUG
-                if(System.Diagnostics.Debugger.IsAttached && application.CheckCompatibilityType == CheckCompatibilityType.DatabaseSchema) {
+                if (System.Diagnostics.Debugger.IsAttached && application.CheckCompatibilityType == CheckCompatibilityType.DatabaseSchema)
+                {
                     application.DatabaseUpdateMode = DatabaseUpdateMode.UpdateDatabaseAlways;
-                    application.DatabaseVersionMismatch += (s, e) => {
+                    application.DatabaseVersionMismatch += (s, e) =>
+                    {
                         e.Updater.Update();
                         e.Handled = true;
                     };
@@ -93,15 +100,18 @@ public class Startup {
 
         services
             .AddControllers()
-            .AddOData((options, serviceProvider) => {
+            .AddOData((options, serviceProvider) =>
+            {
                 options
                     .AddRouteComponents("api/odata", new EdmModelBuilder(serviceProvider).GetEdmModel())
                     .EnableQueryFeatures(100);
             });
 
         services.AddAuthentication()
-            .AddJwtBearer(options => {
-                options.TokenValidationParameters = new TokenValidationParameters() {
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
                     ValidateIssuerSigningKey = true,
                     //ValidIssuer = Configuration["Authentication:Jwt:Issuer"],
                     //ValidAudience = Configuration["Authentication:Jwt:Audience"],
@@ -111,7 +121,8 @@ public class Startup {
                 };
             });
 
-        services.AddAuthorization(options => {
+        services.AddAuthorization(options =>
+        {
             options.DefaultPolicy = new AuthorizationPolicyBuilder(
                 JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
@@ -119,14 +130,17 @@ public class Startup {
                     .Build();
         });
 
-        services.AddSwaggerGen(c => {
+        services.AddSwaggerGen(c =>
+        {
             c.EnableAnnotations();
-            c.SwaggerDoc("v1", new OpenApiInfo {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
                 Title = "AllianzSampleXaf API",
                 Version = "v1",
                 Description = @"Use AddXafWebApi(options) in the AllianzSampleXaf.WebApi\Startup.cs file to make Business Objects available in the Web API."
             });
-            c.AddSecurityDefinition("JWT", new OpenApiSecurityScheme() {
+            c.AddSecurityDefinition("JWT", new OpenApiSecurityScheme()
+            {
                 Type = SecuritySchemeType.Http,
                 Name = "Bearer",
                 Scheme = "bearer",
@@ -137,7 +151,7 @@ public class Startup {
                 {
                     new OpenApiSecurityScheme() {
                         Reference = new OpenApiReference() {
-                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Type = ReferenceType.SecurityScheme,
                             Id = "JWT"
                         }
                     },
@@ -146,7 +160,8 @@ public class Startup {
             });
         });
 
-        services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o => {
+        services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o =>
+        {
             //The code below specifies that the naming of properties in an object serialized to JSON must always exactly match
             //the property names within the corresponding CLR type so that the property names are displayed correctly in the Swagger UI.
             //XPO is case-sensitive and requires this setting so that the example request data displayed by Swagger is always valid.
@@ -157,15 +172,19 @@ public class Startup {
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
-        if(env.IsDevelopment()) {
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
-            app.UseSwaggerUI(c => {
+            app.UseSwaggerUI(c =>
+            {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "AllianzSampleXaf WebApi v1");
             });
         }
-        else {
+        else
+        {
             app.UseExceptionHandler("/Error");
             // The default HSTS value is 30 days. To change this for production scenarios, see: https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
@@ -176,7 +195,8 @@ public class Startup {
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseEndpoints(endpoints => {
+        app.UseEndpoints(endpoints =>
+        {
             endpoints.MapControllers();
             endpoints.MapXafEndpoints();
         });

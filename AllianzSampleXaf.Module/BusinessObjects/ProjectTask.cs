@@ -1,10 +1,12 @@
 using DevExpress.ExpressApp.DC;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl.EF;
+using DevExpress.Persistent.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace AllianzSampleXaf.Module.BusinessObjects;
 [NavigationItem("Planning")]
+[RuleCriteria($"{nameof(EndDate)} >= {nameof(StartDate)}", CustomMessageTemplate = "Start Date must be less than End Date")]
 public class ProjectTask : BaseObject
 {
     [FieldSize(255)]

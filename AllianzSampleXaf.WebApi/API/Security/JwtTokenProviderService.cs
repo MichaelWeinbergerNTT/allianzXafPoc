@@ -9,13 +9,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AllianzSampleXaf.WebApi.JWT;
 
-public class JwtTokenProviderService : IAuthenticationTokenProvider {
-    readonly SignInManager signInManager;
-    readonly IConfiguration configuration;
-    public JwtTokenProviderService(SignInManager signInManager, IConfiguration configuration) {
-        this.signInManager = signInManager;
-        this.configuration = configuration;
-    }
+public class JwtTokenProviderService(SignInManager signInManager, IConfiguration configuration) : IAuthenticationTokenProvider {
+    readonly SignInManager signInManager = signInManager;
+    readonly IConfiguration configuration = configuration;
+
     public string Authenticate(object logonParameters) {
         var result = signInManager.AuthenticateByLogonParameters(logonParameters);
         if(result.Succeeded) {

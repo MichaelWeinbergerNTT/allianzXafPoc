@@ -33,17 +33,14 @@ public class AllianzSampleXafDesignTimeDbContextFactory : IDesignTimeDbContextFa
     }
 }
 [TypesInfoInitializer(typeof(AllianzSampleXafContextInitializer))]
-public class AllianzSampleXafEFCoreDbContext : DbContext
+public class AllianzSampleXafEFCoreDbContext(DbContextOptions<AllianzSampleXafEFCoreDbContext> options) : DbContext(options)
 {
-    public AllianzSampleXafEFCoreDbContext(DbContextOptions<AllianzSampleXafEFCoreDbContext> options) : base(options)
-    {
-    }
     //public DbSet<ModuleInfo> ModulesInfo { get; set; }
     public DbSet<ModelDifference> ModelDifferences { get; set; }
     public DbSet<ModelDifferenceAspect> ModelDifferenceAspects { get; set; }
     public DbSet<PermissionPolicyRole> Roles { get; set; }
-    public DbSet<AllianzSampleXaf.Module.BusinessObjects.ApplicationUser> Users { get; set; }
-    public DbSet<AllianzSampleXaf.Module.BusinessObjects.ApplicationUserLoginInfo> UserLoginsInfo { get; set; }
+    public DbSet<ApplicationUser> Users { get; set; }
+    public DbSet<ApplicationUserLoginInfo> UserLoginsInfo { get; set; }
     public DbSet<DashboardData> DashboardData { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Testimonial> Testimonials { get; set; }
@@ -58,7 +55,7 @@ public class AllianzSampleXafEFCoreDbContext : DbContext
         modelBuilder.SetOneToManyAssociationDeleteBehavior(DeleteBehavior.SetNull, DeleteBehavior.Cascade);
         modelBuilder.HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangingAndChangedNotificationsWithOriginalValues);
         modelBuilder.UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
-        modelBuilder.Entity<AllianzSampleXaf.Module.BusinessObjects.ApplicationUserLoginInfo>(b =>
+        modelBuilder.Entity<ApplicationUserLoginInfo>(b =>
         {
             b.HasIndex(nameof(DevExpress.ExpressApp.Security.ISecurityUserLoginInfo.LoginProviderName), nameof(DevExpress.ExpressApp.Security.ISecurityUserLoginInfo.ProviderUserKey)).IsUnique();
         });

@@ -10,14 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AllianzSampleXaf.Blazor.Server;
 
-public class Startup
+public class Startup(IConfiguration configuration)
 {
-    public Startup(IConfiguration configuration)
-    {
-        Configuration = configuration;
-    }
-
-    public IConfiguration Configuration { get; }
+    public IConfiguration Configuration { get; } = configuration;
 
     // This method gets called by the runtime. Use this method to add services to the container.
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -42,11 +37,11 @@ public class Startup
                 {
                     options.AllowValidationDetailsAccess = false;
                 })
-                .Add<AllianzSampleXaf.Module.AllianzSampleXafModule>()
+                .Add<Module.AllianzSampleXafModule>()
                 .Add<AllianzSampleXafBlazorModule>();
             builder.ObjectSpaceProviders
                 .AddSecuredEFCore(options => options.PreFetchReferenceProperties())
-                    .WithDbContext<AllianzSampleXaf.Module.BusinessObjects.AllianzSampleXafEFCoreDbContext>((serviceProvider, options) =>
+                    .WithDbContext<Module.BusinessObjects.AllianzSampleXafEFCoreDbContext>((serviceProvider, options) =>
                     {
                         // Uncomment this code to use an in-memory database. This database is recreated each time the server starts. With the in-memory database, you don't need to make a migration when the data model is changed.
                         // Do not use this code in production environment to avoid data loss.
@@ -77,10 +72,10 @@ public class Startup
                     options.RoleType = typeof(PermissionPolicyRole);
                     // ApplicationUser descends from PermissionPolicyUser and supports the OAuth authentication. For more information, refer to the following topic: https://docs.devexpress.com/eXpressAppFramework/402197
                     // If your application uses PermissionPolicyUser or a custom user type, set the UserType property as follows:
-                    options.UserType = typeof(AllianzSampleXaf.Module.BusinessObjects.ApplicationUser);
+                    options.UserType = typeof(Module.BusinessObjects.ApplicationUser);
                     // ApplicationUserLoginInfo is only necessary for applications that use the ApplicationUser user type.
                     // If you use PermissionPolicyUser or a custom user type, comment out the following line:
-                    options.UserLoginInfoType = typeof(AllianzSampleXaf.Module.BusinessObjects.ApplicationUserLoginInfo);
+                    options.UserLoginInfoType = typeof(Module.BusinessObjects.ApplicationUserLoginInfo);
                     options.Events.OnSecurityStrategyCreated += securityStrategy =>
                     {
                         // Use the 'PermissionsReloadMode.NoCache' option to load the most recent permissions from the database once
