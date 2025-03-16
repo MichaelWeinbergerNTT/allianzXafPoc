@@ -41,6 +41,7 @@ namespace AllianzSampleXaf.Module.Controllers
                 View.ObjectSpace.Refresh();
             };
         }
+
         protected override void OnActivated()
         {
             base.OnActivated();
