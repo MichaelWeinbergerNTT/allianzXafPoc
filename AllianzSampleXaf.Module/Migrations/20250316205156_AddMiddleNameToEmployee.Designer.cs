@@ -3,6 +3,7 @@ using System;
 using AllianzSampleXaf.Module.BusinessObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AllianzSampleXaf.Module.Migrations
 {
     [DbContext(typeof(AllianzSampleXafEFCoreDbContext))]
-    partial class AllianzSampleXafEFCoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250316205156_AddMiddleNameToEmployee")]
+    partial class AddMiddleNameToEmployee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
